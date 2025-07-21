@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trademark Registration Process - Version A (Concise)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: white;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 0.75in;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .process-steps {
+            padding-right: 15px;
+        }
+        
+        .step {
+            margin-bottom: 20px;
+            padding: 12px;
+            border-left: 3px solid #000;
+            background: #f8f9fa;
+        }
+        
+        .step-number {
+            font-weight: 700;
+            font-size: 14px;
+            color: #000;
+            margin-bottom: 5px;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #000;
+        }
+        
+        .step-description {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #444;
+        }
+        
+        .flowchart-container {
+            padding-left: 15px;
+            border-left: 1px solid #ddd;
+        }
+        
+        .flowchart-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #000;
+        }
+        
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .flow-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 160px;
+            position: relative;
+        }
+        
+        .flow-node.decision {
+            background: #f0f0f0;
+            border-color: #666;
+        }
+        
+        .flow-node.action {
+            background: #fff3cd;
+            border-color: #856404;
+        }
+        
+        .flow-node.success {
+            background: #d4edda;
+            border-color: #155724;
+        }
+        
+        .flow-node.warning {
+            background: #f8d7da;
+            border-color: #721c24;
+        }
+        
+        .flow-arrow {
+            width: 2px;
+            height: 15px;
+            background: #000;
+            position: relative;
+        }
+        
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: -3px;
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 8px solid #000;
+        }
+        
+        .branch-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        
+        .branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .branch-label {
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+            max-width: 80px;
+        }
+        
+        .timeline-note {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .timeline-note h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .timeline-note p {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        @media print {
+            body {
+                max-width: none;
+                margin: 0;
+                padding: 0.5in;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>U.S. Trademark Registration Process</h1>
+        <p class="subtitle">Comprehensive Guide to Federal Trademark Protection</p>
+    </div>
+    
+    <div class="content-grid">
+        <div class="process-steps">
+            <div class="step">
+                <div class="step-number">STEP 1</div>
+                <div class="step-title">Mark Selection</div>
+                <div class="step-description">Choose a distinctive mark (word, phrase, symbol, or design). Fanciful or arbitrary marks offer strongest protection as they are inherently distinctive.</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">STEP 2</div>
+                <div class="step-title">Intake Form & Consultation</div>
+                <div class="step-description">Complete intake form and consult with trademark attorney. $100 consultation fee credited toward registration costs if proceeding.</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">STEP 3</div>
+                <div class="step-title">Clearance Search</div>
+                <div class="step-description">Comprehensive search of existing trademarks to identify potential conflicts. Typically $800 for one mark in one class.</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">STEP 4</div>
+                <div class="step-title">Opinion Letter</div>
+                <div class="step-description">Attorney provides detailed analysis of registration likelihood and potential conflicts based on search results.</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">STEP 5</div>
+                <div class="step-title">Application Preparation & Filing</div>
+                <div class="step-description">Prepare and file application with USPTO. Filing fees and legal fees typically $400-500 for one mark in one class.</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">STEP 6</div>
+                <div class="step-title">USPTO Examination</div>
+                <div class="step-description">USPTO examining attorney reviews application for compliance and substantive issues. May issue Office Actions requiring response.</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">STEP 7</div>
+                <div class="step-title">Publication & Opposition</div>
+                <div class="step-description">Approved applications published in Official Gazette. 30-day opposition period for third parties to challenge registration.</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">STEP 8</div>
+                <div class="step-title">Registration & Maintenance</div>
+                <div class="step-description">If no opposition, registration certificate issues within 2 months. Ongoing maintenance filings required to keep registration active.</div>
+            </div>
+        </div>
+        
+        <div class="flowchart-container">
+            <div class="flowchart-title">Process Flow</div>
+            <div class="flowchart">
+                <div class="flow-node">Mark Selection</div>
+                <div class="flow-arrow"></div>
+                
+                <div class="flow-node">Intake & Consultation</div>
+                <div class="flow-arrow"></div>
+                
+                <div class="flow-node">Clearance Search</div>
+                <div class="flow-arrow"></div>
+                
+                <div class="flow-node decision">Opinion Letter</div>
+                <div class="flow-arrow"></div>
+                
+                <div class="branch-container">
+                    <div class="branch">
+                        <div class="branch-label">Favorable</div>
+                        <div class="flow-node">Application Filed</div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node">USPTO Review</div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node decision">Office Action?</div>
+                        <div class="flow-arrow"></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="branch-label">Yes</div>
+                                <div class="flow-node action">Response Required</div>
+                            </div>
+                            <div class="branch">
+                                <div class="branch-label">No</div>
+                                <div class="flow-node">Notice of Allowance</div>
+                            </div>
+                        </div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node">Publication</div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node decision">Opposition?</div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node success">REGISTRATION</div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node">Maintenance</div>
+                    </div>
+                    <div class="branch">
+                        <div class="branch-label">Unfavorable</div>
+                        <div class="flow-node warning">No Further Action</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="timeline-note">
+        <h3>Timeline Overview</h3>
+        <p>Total process typically takes 14-15 months from filing to registration (without Office Actions). Office Actions may extend timeline by 3-6 months per response cycle.</p>
+    </div>
+</body>
+</html>
