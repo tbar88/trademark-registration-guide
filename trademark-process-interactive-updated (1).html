@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Trademark Registration Flowchart (Updated Layout)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #1a1a1a;
+            overflow: hidden;
+            height: 100vh;
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .timeline-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        .flowchart-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: #1a1a1a;
+        }
+
+        /* Increase the canvas height so the more widely spaced nodes have room */
+        .flowchart-canvas {
+            position: absolute;
+            width: 2000px;
+            height: 3500px;
+            cursor: grab;
+            transition: none;
+        }
+
+        .flowchart-canvas.dragging {
+            cursor: grabbing;
+        }
+
+        /* Node Styles */
+        .node {
+            position: absolute;
+            background: #2d2d2d;
+            border: 2px solid #444;
+            border-radius: 25px;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            z-index: 10;
+            min-width: 180px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(255,255,255,0.1);
+            border-color: #666;
+        }
+
+        .node.active {
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        /* Different node types */
+        .node.decision {
+            background: #4a4a4a;
+            border-color: #666;
+        }
+
+        .node.action-required {
+            background: #d97706;
+            border-color: #f59e0b;
+        }
+
+        .node.success {
+            background: #10b981;
+            border-color: #34d399;
+        }
+
+        .node.warning {
+            background: #dc2626;
+            border-color: #ef4444;
+        }
+
+        .node.special {
+            background: #7c3aed;
+            border-color: #8b5cf6;
+        }
+
+        /* Time Labels */
+        .time-label {
+            position: absolute;
+            background: transparent;
+            color: #999;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 400;
+            z-index: 5;
+            white-space: nowrap;
+        }
+
+        /* Connector Lines */
+        .connector-path {
+            fill: none;
+            stroke: #666;
+            stroke-width: 2;
+            z-index: 1;
+        }
+
+        .connector-arrow {
+            fill: #666;
+            z-index: 2;
+        }
+
+        /* Branch Labels */
+        .branch-label {
+            position: absolute;
+            color: #ccc;
+            font-size: 12px;
+            font-weight: 400;
+            z-index: 6;
+            white-space: nowrap;
+        }
+
+        /* Detail Panel */
+        .detail-panel {
+            position: fixed;
+            right: -500px;
+            top: 0;
+            width: 500px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            border-left: 1px solid #333;
+            transition: right 0.4s ease;
+            z-index: 200;
+            overflow-y: auto;
+            color: white;
+        }
+
+        .detail-panel.active {
+            right: 0;
+        }
+
+        .detail-panel-header {
+            background: #000;
+            padding: 30px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid #333;
+        }
+
+        .detail-panel-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .detail-panel-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .detail-panel-content {
+            padding: 30px;
+        }
+
+        .detail-step-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .detail-description {
+            color: #ccc;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            color: white;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            border-color: #666;
+            transform: translateY(-2px);
+        }
+
+        /* Legend */
+        .legend {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            font-size: 13px;
+            z-index: 100;
+        }
+
+        .legend-title {
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+
+        .legend-node {
+            width: 60px;
+            height: 24px;
+            border-radius: 12px;
+            border: 2px solid;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Zoom indicator */
+        .zoom-indicator {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 100;
+            color: white;
+        }
+
+        /* Fullscreen button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.2s ease;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            border-color: #666;
+        }
+
+        .fullscreen-btn svg {
+            stroke: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>U.S. Trademark Registration Process</h1>
+            <span class="timeline-badge">⏱️ Total Timeline: 14-15 months (without Office Actions)</span>
+        </div>
+        
+        <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+            </svg>
+        </button>
+        
+        <div class="flowchart-container" id="flowchartContainer">
+            <div class="flowchart-canvas" id="flowchartCanvas">
+                <svg id="connectionsLayer" style="position: absolute; width: 100%; height: 100%; z-index: 1;"></svg>
+                <!-- Flowchart nodes will be generated here -->
+            </div>
+        </div>
+        
+        <div class="detail-panel" id="detailPanel">
+            <div class="detail-panel-header">
+                <button class="detail-panel-close" onclick="closeDetailPanel()">×</button>
+                <h2 class="detail-step-title" id="detailTitle">Step Title</h2>
+            </div>
+            <div class="detail-panel-content">
+                <p class="detail-description" id="detailDescription">Description</p>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="control-btn" onclick="resetView()">
+                <span>🏠</span> Reset View
+            </button>
+            <button class="control-btn" onclick="zoomIn()">
+                <span>➕</span> Zoom In
+            </button>
+            <button class="control-btn" onclick="zoomOut()">
+                <span>➖</span> Zoom Out
+            </button>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-title">Process Guide</div>
+            <div class="legend-item">
+                <div class="legend-node" style="background: #2d2d2d; border-color: #444;">Step</div>
+                <span>Process Step</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-node" style="background: #4a4a4a; border-color: #666;">Decision</div>
+                <span>Decision Point</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-node" style="background: #d97706; border-color: #f59e0b;">Action</div>
+                <span>Action Required</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-node" style="background: #10b981; border-color: #34d399;">Success</div>
+                <span>Registration</span>
+            </div>
+        </div>
+        
+        <div class="zoom-indicator" id="zoomIndicator">100%</div>
+    </div>
+
+    <script>
+        // Flowchart data with updated positions to provide a more evenly spaced layout
+        const nodes = [
+            {
+                id: 1,
+                title: "Selecting a Mark",
+                type: "normal",
+                x: 600,
+                y: 50,
+                description: "The first step is to choose a mark that you want to register. This could be a word, phrase, symbol, or design that identifies and distinguishes the source of your goods or services from others. Trademarks are typically categorized as fanciful, arbitrary, suggestive, descriptive, or generic. Fanciful marks are invented words with no dictionary or other known meaning. Arbitrary marks are existing words that have no connection or relevance to the goods or services being sold. Suggestive marks suggest a characteristic of the goods or services but require some imagination to connect the mark with the goods or services. Descriptive marks describe a characteristic or quality of the goods or services. Generic terms are common words or terms that are the accepted and recognized description of a class of goods or services. It's best to select fanciful or arbitrary marks because they are inherently distinctive and easier to protect."
+            },
+            {
+                id: 2,
+                title: "Submit Intake Form",
+                type: "normal",
+                x: 600,
+                y: 190,
+                description: "The first formal step to launching the registration process is filling out the trademark intake form, which allows the attorney to conduct a preliminary assessment of your mark and gather all required information.",
+                timeFromPrev: "1-2 days"
+            },
+            {
+                id: 3,
+                title: "Initial Consultation",
+                type: "normal",
+                x: 600,
+                y: 330,
+                description: "You would typically consult with a law firm or a trademark attorney to discuss your mark, your business, and your goals for the trademark. The attorney can provide advice on whether your mark is likely to be registrable and how to proceed. Please note that while a consultation fee is charged when scheduling the consultation, if the client wishes to proceed with the trademark registration process, the fee is credited towards those subsequent costs.",
+                timeFromPrev: "2-3 days"
+            },
+            {
+                id: 4,
+                title: "Trademark Clearance Search",
+                type: "normal",
+                x: 600,
+                y: 470,
+                description: "The law firm conducts a comprehensive search of existing trademarks to check if your chosen mark or a similar one is already registered or applied for by someone else. This is known as a clearance search. Because the clearance search and the opinion letter described in the following step involve both flat fees and a significant investment of time and effort, the fees for the clearance search and opinion letter are to be paid prior to the commencement of this step.",
+                timeFromPrev: "1 week"
+            },
+            {
+                id: 5,
+                title: "Opinion Letter",
+                type: "decision",
+                x: 600,
+                y: 610,
+                description: "Based on the results of the clearance search, the law firm will provide an opinion letter. This letter will detail the likelihood of successful registration, potential conflicts, and any other issues that might affect the registrability of your mark. If the opinion letter reveals significant hurdles to registration, it is not uncommon for the trademark registration applicant to make changes to the mark and/or goods or services claimed, pursue an entirely new idea, or decide not to continue with the trademark registration application process altogether.",
+                timeFromPrev: "1-2 weeks"
+            },
+            {
+                id: "5a",
+                title: "No further action",
+                type: "warning",
+                x: 900,
+                y: 680,
+                description: "If the opinion letter reveals significant hurdles to registration, you may need to make changes to the mark and/or goods or services claimed, pursue an entirely new idea, or decide not to continue with the trademark registration application process altogether."
+            },
+            {
+                id: 6,
+                title: "Trademark Application",
+                type: "normal",
+                x: 600,
+                y: 820,
+                description: "If the opinion letter is favorable, the next step is to prepare the trademark application. This includes providing information about the mark, the goods or services it will be used for, and the applicant's information. Depending on the type of application used (which is determined by the goods and services sought to be claimed in the application), fees for preparing the application must be paid prior to the commencement of this step."
+            },
+            {
+                id: 7,
+                title: "Application Filed with USPTO",
+                type: "normal",
+                x: 600,
+                y: 960,
+                description: "The application is then filed with the USPTO. The filing date is important as it establishes who filed first in case of disputes. Currently, absent any Office Actions, the average time between filing the application and receiving a Notice of Allowance is about 14-15 months.",
+                timeFromPrev: "3-5 days"
+            },
+            {
+                id: 8,
+                title: "Application Reviewed by Examiner",
+                type: "normal",
+                x: 600,
+                y: 1100,
+                description: "The USPTO assigns an examining attorney to review the application. This review includes checking for compliance with formalities and substantive issues like likelihood of confusion with existing marks."
+            },
+            {
+                id: 9,
+                title: "Non-Final Office Action",
+                type: "decision",
+                x: 350,
+                y: 1310,
+                description: "If the examining attorney identifies any issues with the application, they will issue a non-final Office Action. This is a document that explains the issues and gives the applicant a chance to respond.",
+                timeFromPrev: "3-4 months"
+            },
+            {
+                id: 10,
+                title: "Response to Office Action",
+                type: "action-required",
+                x: 350,
+                y: 1450,
+                description: "The applicant (or their attorney) must respond to any non-final Office Actions within a specified time frame. The response should address the issues raised by the examining attorney.",
+                timeFromPrev: "3 month deadline"
+            },
+            {
+                id: 11,
+                title: "Final Office Action",
+                type: "decision",
+                x: 350,
+                y: 1660,
+                description: "If the examining attorney is not satisfied with the response, or if new issues arise, they may issue a final Office Action. This provides a final opportunity for the applicant to address the issues.",
+                timeFromPrev: "1-2 months"
+            },
+            {
+                id: 12,
+                title: "Response to Final OA",
+                type: "action-required",
+                x: 350,
+                y: 1800,
+                description: "The applicant (or their attorney) must respond to the final Office Action. If the issues are not satisfactorily resolved, the application may be refused.",
+                timeFromPrev: "1-2 months"
+            },
+            {
+                id: 13,
+                title: "Appeal Process",
+                type: "special",
+                x: 900,
+                y: 2220,
+                description: "If the application is refused, the applicant can appeal the decision to the Trademark Trial and Appeal Board (TTAB). This must be done within six months of the final refusal. The details of an appeal, however, are outside the scope of this overview."
+            },
+            {
+                id: "13a",
+                title: "Application Denied",
+                type: "warning",
+                x: 350,
+                y: 2080,
+                description: "If final issues cannot be resolved, the application is refused and registration is denied."
+            },
+            {
+                id: 14,
+                title: "Notice of Allowance",
+                type: "normal",
+                x: 600,
+                y: 1380,
+                description: "If the examining attorney is satisfied with the response and all issues have been resolved, a Notice of Allowance is issued. This indicates that the mark has been allowed for publication.",
+                timeFromPrev: "1 month"
+            },
+            {
+                id: 15,
+                title: "Publication for Opposition",
+                type: "normal",
+                x: 600,
+                y: 1520,
+                description: "If the examining attorney approves the application, it is published in the Official Gazette. This gives third parties a chance to oppose the registration if they believe it would infringe on their rights.",
+                timeFromPrev: "1 month"
+            },
+            {
+                id: 16,
+                title: "Opposition Filed",
+                type: "decision",
+                x: 350,
+                y: 1730,
+                description: "There is a 30-day period during which third parties can file an opposition. If an opposition is filed, proceedings are held before the TTAB. While it is worth noting that opposition proceedings can be long and costly, a full discussion of these proceedings is outside the scope of this overview."
+            },
+            {
+                id: "16a",
+                title: "Proceedings before TTAB",
+                type: "action-required",
+                x: 100,
+                y: 1870,
+                description: "If an opposition is filed, proceedings are held before the Trademark Trial and Appeal Board. Opposition proceedings can be lengthy and involve discovery, testimony, and briefing similar to federal court litigation."
+            },
+            {
+                id: 17,
+                title: "CERTIFICATE OF REGISTRATION ISSUES",
+                type: "success",
+                x: 600,
+                y: 1940,
+                description: "If there is no opposition, or if an opposition is unsuccessful, the mark is registered within two months. Once registered, the owner of the mark has exclusive rights to use the mark nationwide in connection with the goods and/or services listed in the registration.",
+                timeFromPrev: "2 months"
+            },
+            {
+                id: 18,
+                title: "Maintenance",
+                type: "normal",
+                x: 600,
+                y: 2150,
+                description: "After registration, there are maintenance documents that must be filed at regular intervals to keep the registration alive. While noted here, trademark registration maintenance is beyond the scope of this overview."
+            }
+        ];
+
+        // Connection data
+        const connections = [
+            {from: 1, to: 2},
+            {from: 2, to: 3},
+            {from: 3, to: 4},
+            {from: 4, to: 5},
+            // Update the branch label position for the "No further action" branch
+            {from: 5, to: "5a", label: "Client Decides Not to Proceed", labelX: 750, labelY: 650},
+            {from: 5, to: 6, label: "Client Decides to Proceed"},
+            {from: 6, to: 7},
+            {from: 7, to: 8},
+            {from: 8, to: 9, label: "8.5 mos", curve: true},
+            // Update the "No Office Action" label position
+            {from: 8, to: 14, label: "No Office Action\n14-15 mos", labelX: 560, labelY: 1240},
+            {from: 9, to: 10},
+            {from: 10, to: 11},
+            {from: 11, to: 12},
+            {from: 12, to: "13a", label: "Office Action Not Withdrawn"},
+            {from: 12, to: 14, label: "Office Action Withdrawn", curve: true},
+            {from: "13a", to: 13, label: "Option to Appeal"},
+            {from: 11, to: 14, label: "Office Action Withdrawn", curve: true},
+            {from: 14, to: 15},
+            {from: 15, to: 16, label: "Opposition Filed", curve: true},
+            {from: 15, to: 17, label: "No Opposition"},
+            {from: 16, to: "16a"},
+            {from: "16a", to: 17, label: "Successful Opposition", curve: true},
+            {from: "16a", to: "13a", label: "Unsuccessful Opposition", curve: true},
+            {from: 17, to: 18}
+        ];
+
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let isDragging = false;
+        let startX, startY;
+
+        const canvas = document.getElementById('flowchartCanvas');
+        const container = document.getElementById('flowchartContainer');
+        const svg = document.getElementById('connectionsLayer');
+
+        // Create nodes
+        function createNode(node) {
+            const nodeEl = document.createElement('div');
+            nodeEl.className = `node ${node.type}`;
+            nodeEl.style.left = (node.x - 90) + 'px';
+            nodeEl.style.top = node.y + 'px';
+            nodeEl.dataset.nodeId = node.id;
+            nodeEl.textContent = node.title;
+            
+            nodeEl.addEventListener('click', () => showNodeDetails(node));
+            return nodeEl;
+        }
+
+        // Create curved path
+        function createPath(x1, y1, x2, y2, curve) {
+            if (curve) {
+                const midX = (x1 + x2) / 2;
+                const midY = (y1 + y2) / 2;
+                const controlX = midX + (curve === true ? 100 : 0);
+                return `M ${x1} ${y1} Q ${controlX} ${midY} ${x2} ${y2}`;
+            } else {
+                return `M ${x1} ${y1} L ${x2} ${y2}`;
+            }
+        }
+
+        // Create connections
+        function createConnections() {
+            svg.innerHTML = ''; // Clear existing
+            
+            // Add arrow marker definition
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            defs.innerHTML = `
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                        refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" class="connector-arrow" />
+                </marker>
+            `;
+            svg.appendChild(defs);
+            
+            connections.forEach(conn => {
+                const fromNode = nodes.find(n => n.id === conn.from);
+                const toNode = nodes.find(n => n.id === conn.to);
+                
+                if (!fromNode || !toNode) return;
+                
+                const x1 = fromNode.x;
+                const y1 = fromNode.y + 25;
+                const x2 = toNode.x;
+                const y2 = toNode.y;
+                
+                // Create path
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', createPath(x1, y1, x2, y2, conn.curve));
+                path.setAttribute('class', 'connector-path');
+                path.setAttribute('marker-end', 'url(#arrowhead)');
+                svg.appendChild(path);
+                
+                // Add label if exists
+                if (conn.label) {
+                    const label = document.createElement('div');
+                    label.className = 'branch-label';
+                    label.innerHTML = conn.label.replace('\n', '<br>');
+                    label.style.left = (conn.labelX || ((x1 + x2) / 2 - 40)) + 'px';
+                    label.style.top = (conn.labelY || ((y1 + y2) / 2 - 10)) + 'px';
+                    canvas.appendChild(label);
+                }
+                
+                // Add time label if node has timeFromPrev
+                if (fromNode.timeFromPrev && !conn.label) {
+                    const timeLabel = document.createElement('div');
+                    timeLabel.className = 'time-label';
+                    timeLabel.textContent = fromNode.timeFromPrev;
+                    timeLabel.style.left = (((x1 + x2) / 2) - 30) + 'px';
+                    timeLabel.style.top = (((y1 + y2) / 2) - 10) + 'px';
+                    canvas.appendChild(timeLabel);
+                }
+            });
+        }
+
+        // Show node details
+        function showNodeDetails(node) {
+            document.getElementById('detailTitle').textContent = node.title;
+            document.getElementById('detailDescription').textContent = node.description;
+            
+            document.getElementById('detailPanel').classList.add('active');
+            
+            // Highlight active node
+            document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
+            document.querySelector(`[data-node-id="${node.id}"]`).classList.add('active');
+        }
+
+        function closeDetailPanel() {
+            document.getElementById('detailPanel').classList.remove('active');
+            document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
+        }
+
+        // Pan and zoom functionality
+        function updateTransform() {
+            canvas.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            document.getElementById('zoomIndicator').textContent = Math.round(scale * 100) + '%';
+        }
+
+        function resetView() {
+            // Start slightly zoomed-out and offset to better frame the new layout
+            scale = 0.7;
+            translateX = -150;
+            translateY = -30;
+            updateTransform();
+        }
+
+        function zoomIn() {
+            scale = Math.min(scale * 1.2, 2);
+            updateTransform();
+        }
+
+        function zoomOut() {
+            scale = Math.max(scale / 1.2, 0.3);
+            updateTransform();
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Mouse drag functionality
+        container.addEventListener('mousedown', (e) => {
+            if (e.target === container || e.target.tagName === 'svg' || e.target.tagName === 'path') {
+                isDragging = true;
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+                canvas.classList.add('dragging');
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                translateX = e.clientX - startX;
+                translateY = e.clientY - startY;
+                updateTransform();
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            canvas.classList.remove('dragging');
+        });
+
+        // Mouse wheel zoom
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale = Math.min(Math.max(scale * delta, 0.3), 2);
+            updateTransform();
+        });
+
+        // Initialize flowchart
+        function initFlowchart() {
+            // Create all nodes
+            nodes.forEach(node => {
+                canvas.appendChild(createNode(node));
+            });
+            
+            // Create connections
+            createConnections();
+            
+            // Set initial view
+            resetView();
+        }
+
+        // Initialize on load
+        window.addEventListener('load', initFlowchart);
+    </script>
+</body>
+</html>
